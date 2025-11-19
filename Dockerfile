@@ -1,35 +1,35 @@
 # Build stage - Backend
 FROM node:20-alpine AS backend-builder
 
-WORKDIR /app/backend
+WORKDIR /app
 
-COPY backend/package*.json ./
-RUN npm ci
+COPY backend/package*.json ./backend/
+RUN cd backend && npm ci
 
-COPY backend/src ./src
-COPY backend/tsconfig.json ./
-COPY backend/prisma ./prisma
-COPY backend/eslint.config.js ./
+COPY backend/src ./backend/src
+COPY backend/tsconfig.json ./backend/
+COPY backend/prisma ./backend/prisma
+COPY backend/eslint.config.js ./backend/
 
-RUN npm run build
+RUN cd backend && npm run build
 
 # Build stage - Frontend
 FROM node:20-alpine AS frontend-builder
 
-WORKDIR /app/frontend
+WORKDIR /app
 
-COPY frontend/package*.json ./
-RUN npm ci
+COPY frontend/package*.json ./frontend/
+RUN cd frontend && npm ci
 
-COPY frontend/src ./src
-COPY frontend/public ./public
-COPY frontend/index.html ./
-COPY frontend/vite.config.ts ./
-COPY frontend/tsconfig*.json ./
-COPY frontend/tailwind.config.js ./
-COPY frontend/postcss.config.js ./
+COPY frontend/src ./frontend/src
+COPY frontend/public ./frontend/public
+COPY frontend/index.html ./frontend/
+COPY frontend/vite.config.ts ./frontend/
+COPY frontend/tsconfig*.json ./frontend/
+COPY frontend/tailwind.config.js ./frontend/
+COPY frontend/postcss.config.js ./frontend/
 
-RUN npm run build
+RUN cd frontend && npm run build
 
 # Production stage
 FROM node:20-alpine
