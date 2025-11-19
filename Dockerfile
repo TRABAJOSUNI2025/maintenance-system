@@ -1,7 +1,7 @@
 # Build stage - Backend
 FROM node:20-alpine AS backend-builder
 
-# Invalidate cache
+# Invalidate cache - Build ID: 2025-11-19-v2
 RUN echo "Build timestamp: $(date)"
 
 WORKDIR /app
