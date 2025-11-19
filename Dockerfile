@@ -1,6 +1,9 @@
 # Build stage - Backend
 FROM node:20-alpine AS backend-builder
 
+# Invalidate cache
+RUN echo "Build timestamp: $(date)"
+
 WORKDIR /app
 
 COPY backend/package*.json ./backend/
