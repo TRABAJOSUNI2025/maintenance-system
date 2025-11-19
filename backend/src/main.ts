@@ -4,6 +4,7 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import * as path from 'path';
+import { Request, Response, NextFunction } from 'express';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -33,7 +34,7 @@ async function bootstrap() {
   app.useStaticAssets(frontendPath);
 
   // Redirigir rutas desconocidas al index.html (SPA)
-  app.use((req, res, next) => {
+  app.use((req: Request, res: Response, next: NextFunction) => {
     if (!req.url.startsWith('/api/') && req.url !== '/api/docs' && req.url !== '/api/docs-json') {
       // Si no es una ruta de API, servir index.html
       if (!req.url.includes('.')) {

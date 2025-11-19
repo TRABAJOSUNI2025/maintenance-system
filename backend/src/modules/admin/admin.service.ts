@@ -99,7 +99,7 @@ export class AdminService {
 
     // Crear array con todos los estados, incluso los que no tienen datos
     const allStatuses = Object.entries(statusNames).map(([id, name]) => {
-      const statusData = statuses.find(s => s.idestadomantenimiento === parseInt(id));
+      const statusData = statuses.find((s: any) => s.idestadomantenimiento === parseInt(id));
       return {
         status: name,
         count: statusData?._count || 0,
@@ -114,7 +114,7 @@ export class AdminService {
       by: ['estado'],
       _count: true,
     });
-    return statuses.map((s) => ({
+    return statuses.map((s: any) => ({
       status: s.estado,
       count: s._count,
     }));
@@ -134,7 +134,7 @@ export class AdminService {
       },
     });
 
-    const activities: any[] = recentTickets.map((t) => ({
+    const activities: any[] = recentTickets.map((t: any) => ({
       type: 'ticket',
       id: t.codticket,
       title: `Ticket: ${t.vehiculo?.marca} ${t.vehiculo?.modelo}`,
@@ -166,7 +166,7 @@ export class AdminService {
     // Agrupar por mes
     const monthlyData = Array(12).fill(0);
     
-    ticketsByMonth.forEach((item) => {
+    ticketsByMonth.forEach((item: any) => {
       if (item.fecha) {
         const month = new Date(item.fecha).getMonth();
         monthlyData[month] += item._count;
@@ -176,7 +176,7 @@ export class AdminService {
     return {
       year: currentYear,
       data: monthlyData,
-      total: ticketsByMonth.reduce((sum, item) => sum + item._count, 0),
+      total: ticketsByMonth.reduce((sum: number, item: any) => sum + item._count, 0),
       months: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
     };
   }
