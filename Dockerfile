@@ -11,6 +11,9 @@ COPY backend/tsconfig.json ./
 COPY backend/prisma ./prisma
 COPY backend/eslint.config.js ./
 
+# Generar cliente de Prisma antes de compilar
+RUN npx prisma generate
+
 RUN npm run build
 
 # Build stage - Frontend
