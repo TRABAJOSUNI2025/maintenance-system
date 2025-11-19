@@ -48,6 +48,7 @@ COPY --from=backend-builder /app/backend/dist ./dist
 COPY backend/package*.json ./
 COPY backend/prisma ./prisma
 COPY backend/docker-entrypoint.sh ./
+COPY backend/.env.production ./.env
 
 # Hacer script ejecutable
 RUN chmod +x ./docker-entrypoint.sh
