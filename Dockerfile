@@ -32,8 +32,11 @@ COPY frontend/tsconfig*.json ./
 COPY frontend/tailwind.config.js ./
 COPY frontend/postcss.config.js ./
 
-# Compilar frontend
-RUN npm run build
+# Compilar frontend con output detallado
+RUN echo "Starting frontend build..." && \
+    npm run build && \
+    echo "Frontend build completed" && \
+    ls -la dist/ || echo "ERROR: dist directory not found"
 
 # Production stage
 FROM node:20-alpine
@@ -55,7 +58,7 @@ COPY backend/.env.production ./.env
 RUN chmod +x ./docker-entrypoint.sh
 
 # Copiar frontend dist
-COPY --from=frontend-builder /app/frontend/dist ../frontend/dist
+COPY --from=frontend-builder /app/frontend/dist ../frontend/dist/
 
 EXPOSE 3000
 
