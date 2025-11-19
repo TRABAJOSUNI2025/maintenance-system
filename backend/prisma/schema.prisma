@@ -1,0 +1,341 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Usuario {
+  idusuario    Int       @id @default(autoincrement())
+  username     String    @unique @db.VarChar(40)
+  passwordhash String    @db.VarChar(200)
+  correo       String    @unique @db.VarChar(60)
+  estado       String?   @default("A") @db.Char(1)
+  empleado     Empleado?
+  cliente      Cliente?
+
+  @@map("usuario")
+}
+
+model Rol {
+  idrol       Int           @id @default(autoincrement())
+  nombrerol   String        @unique @db.VarChar(30)
+  empleadorol EmpleadoRol[]
+
+  @@map("rol")
+}
+
+model Empleado {
+  idempleado      Int               @id @default(autoincrement())
+  idusuario       Int               @unique
+  dni             String            @unique @db.Char(8)
+  nombres         String            @db.VarChar(40)
+  apepaterno      String?           @db.VarChar(30)
+  apematerno      String?           @db.VarChar(30)
+  telefono        String?           @db.VarChar(9)
+  especialidad    String?           @db.VarChar(40)
+  asignaroperario AsignarOperario[]
+  diagnostico     Diagnostico[]
+  dispoperario    DispOperario[]
+  usuario         Usuario           @relation(fields: [idusuario], references: [idusuario], onDelete: NoAction, onUpdate: NoAction)
+  empleadorol     EmpleadoRol[]
+  ticket          Ticket[]
+
+  @@map("empleado")
+}
+
+model EmpleadoRol {
+  idempleado Int
+  idrol      Int
+  empleado   Empleado @relation(fields: [idempleado], references: [idempleado], onDelete: NoAction, onUpdate: NoAction)
+  rol        Rol      @relation(fields: [idrol], references: [idrol], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([idempleado, idrol])
+  @@map("empleadorol")
+}
+
+model Cliente {
+  dnicliente    String          @id @db.Char(8)
+  idusuario     Int?            @unique
+  nombre        String?         @db.VarChar(20)
+  apepaterno    String?         @db.VarChar(20)
+  apematerno    String?         @db.VarChar(20)
+  telefono      String?         @db.VarChar(9)
+  correo        String?         @db.VarChar(40)
+  cuentacliente CuentaCliente[]
+  ticket        Ticket[]
+  usuario       Usuario?        @relation(fields: [idusuario], references: [idusuario], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("cliente")
+}
+
+model Vehiculo {
+  codvehiculo      String          @id @db.Char(8)
+  placa            String?         @unique @db.VarChar(6)
+  marca            String?         @db.VarChar(20)
+  modelo           String?         @db.VarChar(20)
+  fechafabricacion DateTime?       @db.Date
+  kilometraje      Decimal?        @db.Decimal(10, 2)
+  cuentacliente    CuentaCliente[]
+  ticket           Ticket[]
+
+  @@map("vehiculo")
+}
+
+model CuentaCliente {
+  codcuentacliente String            @id @db.Char(8)
+  dnicliente       String            @db.Char(8)
+  codvehiculo      String            @db.Char(8)
+  totalpendientes  Int?              @default(0)
+  totalcancelados  Int?              @default(0)
+  totalrealizados  Int?              @default(0)
+  vehiculo         Vehiculo          @relation(fields: [codvehiculo], references: [codvehiculo], onDelete: NoAction, onUpdate: NoAction)
+  cliente          Cliente           @relation(fields: [dnicliente], references: [dnicliente], onDelete: NoAction, onUpdate: NoAction)
+  movimientoventa  MovimientoVenta[]
+
+  @@map("cuentacliente")
+}
+
+model EstadoTicket {
+  idestadoticket Int      @id @default(autoincrement())
+  nombreestado   String   @unique @db.VarChar(30)
+  tickets        Ticket[]
+
+  @@map("estadoticket")
+}
+
+model LoteTicket {
+  codloteticket    String    @id @db.Char(8)
+  totalgenerados   Int?
+  totalasignados   Int?
+  totaldisponibles Int?
+  totalcancelados  Int?
+  fechageneracion  DateTime? @db.Date
+  fechavencimiento DateTime? @db.Date
+  ticket           Ticket[]
+
+  @@map("loteticket")
+}
+
+model Ticket {
+  codticket       String            @id @db.Char(8)
+  codloteticket   String?           @db.Char(8)
+  idsupervisor    Int?
+  fecha           DateTime?         @db.Date
+  horainiestimada DateTime?         @db.Time(6)
+  horafinestimada DateTime?         @db.Time(6)
+  estado          Int?
+  dnicliente      String?           @db.Char(8)
+  codvehiculo     String?           @db.Char(8)
+  asignaroperario AsignarOperario[]
+  mantenimientos  Mantenimientos[]
+  movimientoventa MovimientoVenta[]
+  loteticket      LoteTicket?       @relation(fields: [codloteticket], references: [codloteticket], onDelete: NoAction, onUpdate: NoAction)
+  vehiculo        Vehiculo?         @relation(fields: [codvehiculo], references: [codvehiculo], onDelete: NoAction, onUpdate: NoAction)
+  cliente         Cliente?          @relation(fields: [dnicliente], references: [dnicliente], onDelete: NoAction, onUpdate: NoAction)
+  estadoTicket    EstadoTicket?     @relation(fields: [estado], references: [idestadoticket], onDelete: NoAction, onUpdate: NoAction)
+  empleado        Empleado?         @relation(fields: [idsupervisor], references: [idempleado], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("ticket")
+}
+
+model MovimientoVenta {
+  canal            Int
+  corr             Int
+  codcuentacliente String?        @db.Char(8)
+  codticket        String?        @db.Char(8)
+  monto            Decimal?       @db.Decimal(10, 2)
+  fecha            DateTime?      @db.Date
+  hora             DateTime?      @db.Time(6)
+  estado           Int?
+  cuentacliente    CuentaCliente? @relation(fields: [codcuentacliente], references: [codcuentacliente], onDelete: NoAction, onUpdate: NoAction)
+  ticket           Ticket?        @relation(fields: [codticket], references: [codticket], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([canal, corr])
+  @@map("movimientoventa")
+}
+
+model Protocolo {
+  codprotocolo      Int                 @id
+  nombre            String?             @db.VarChar(30)
+  descripcion       String?             @db.VarChar(100)
+  duracionestimada  Int?
+  catalogoservicios CatalogoServicios[]
+
+  @@map("protocolo")
+}
+
+model TipoMantenimiento {
+  idtipomantenimiento Int                 @id @default(autoincrement())
+  nombretipo          String              @unique @db.VarChar(30)
+  catalogoservicios   CatalogoServicios[]
+
+  @@map("tipomantenimiento")
+}
+
+model CatalogoServicios {
+  codservicio         String               @id @db.Char(8)
+  descripcion         String?              @db.VarChar(75)
+  marca               String?              @db.VarChar(20)
+  modelo              String?              @db.VarChar(30)
+  kilometrajeinicial  Int?
+  kilometrajefinal    Int?
+  tarifa              Decimal?             @db.Decimal(10, 2)
+  duracion            Int?
+  codprotocolo        Int?
+  idtipomantenimiento Int
+  protocolo           Protocolo?           @relation(fields: [codprotocolo], references: [codprotocolo], onDelete: NoAction, onUpdate: NoAction)
+  tipomantenimiento   TipoMantenimiento    @relation(fields: [idtipomantenimiento], references: [idtipomantenimiento], onDelete: NoAction, onUpdate: NoAction)
+  mantenimientos      Mantenimientos[]
+
+  @@map("catalogoservicios")
+}
+
+model EstadoMantenimiento {
+  idestadomantenimiento Int              @id @default(autoincrement())
+  nombreestado          String           @unique @db.VarChar(30)
+  mantenimientos        Mantenimientos[]
+
+  @@map("estadomantenimiento")
+}
+
+model Mantenimientos {
+  codmantenimiento      String               @id @db.Char(8)
+  codticket             String?              @db.Char(8)
+  codservicio           String?              @db.Char(8)
+  horainicioreal        DateTime?            @db.Time(6)
+  horafinreal           DateTime?            @db.Time(6)
+  fecharealiza          DateTime?            @db.Date
+  monto                 Decimal?             @db.Decimal(10, 2)
+  observaciones         String?              @db.VarChar(100)
+  estado                Int?
+  idestadomantenimiento Int?
+  diagnostico           Diagnostico[]
+  catalogoservicios     CatalogoServicios?   @relation(fields: [codservicio], references: [codservicio], onDelete: NoAction, onUpdate: NoAction)
+  ticket                Ticket?              @relation(fields: [codticket], references: [codticket], onDelete: NoAction, onUpdate: NoAction)
+  estadomantenimiento   EstadoMantenimiento? @relation(fields: [idestadomantenimiento], references: [idestadomantenimiento], onDelete: NoAction, onUpdate: NoAction)
+  repuestousado         RepuestoUsado[]
+
+  @@map("mantenimientos")
+}
+
+model Diagnostico {
+  coddiagnostico   String          @id @db.Char(8)
+  codmantenimiento String?         @db.Char(8)
+  idoperario       Int
+  area             String?         @db.VarChar(40)
+  problemas        String?         @db.VarChar(200)
+  motivoderivacion String?         @db.VarChar(200)
+  fecharegistro    DateTime?       @db.Date
+  horaregistro     DateTime?       @db.Time(6)
+  mantenimientos   Mantenimientos? @relation(fields: [codmantenimiento], references: [codmantenimiento], onDelete: NoAction, onUpdate: NoAction)
+  empleado         Empleado        @relation(fields: [idoperario], references: [idempleado], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("diagnostico")
+}
+
+model Repuesto {
+  codrepuesto          String             @id @db.Char(8)
+  codcategoriarepuesto String?            @db.Char(8)
+  nombre               String?            @db.VarChar(20)
+  descripcion          String?            @db.VarChar(100)
+  fechaadquisicion     DateTime?          @db.Date
+  fechacaducidad       DateTime?          @db.Date
+  stock                Int?
+  categoriarepuesto    categoriarepuesto? @relation(fields: [codcategoriarepuesto], references: [codcategoriarepuesto], onDelete: NoAction, onUpdate: NoAction)
+  repuestousado        RepuestoUsado[]
+
+  @@map("repuesto")
+}
+
+model RepuestoUsado {
+  codrepuestousado String          @id @db.Char(8)
+  codrepuesto      String?         @db.Char(8)
+  codmantenimiento String?         @db.Char(8)
+  cantidadusada    Int?
+  mantenimientos   Mantenimientos? @relation(fields: [codmantenimiento], references: [codmantenimiento], onDelete: NoAction, onUpdate: NoAction)
+  repuesto         Repuesto?       @relation(fields: [codrepuesto], references: [codrepuesto], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("repuestousado")
+}
+
+model Rampa {
+  codrampa           String               @id @db.Char(8)
+  descripcion        String?              @db.VarChar(100)
+  capacidad          Int?
+  asignarherramienta AsignarHerramienta[]
+  disprampa          DispRampa[]
+
+  @@map("rampa")
+}
+
+model HorarioDisp {
+  codhorariodisp String         @id @db.Char(8)
+  fecha          DateTime?      @db.Date
+  horainicio     DateTime?      @db.Time(6)
+  horafin        DateTime?      @db.Time(6)
+  dispoperario   DispOperario[]
+  disprampa      DispRampa[]
+
+  @@map("horariodisp")
+}
+
+model DispRampa {
+  coddisprampa   String       @id @db.Char(8)
+  codrampa       String?      @db.Char(8)
+  codhorariodisp String?      @db.Char(8)
+  horariodisp    HorarioDisp? @relation(fields: [codhorariodisp], references: [codhorariodisp], onDelete: NoAction, onUpdate: NoAction)
+  rampa          Rampa?       @relation(fields: [codrampa], references: [codrampa], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("disprampa")
+}
+
+model DispOperario {
+  coddispoperario String       @id @db.Char(8)
+  idempleado      Int?
+  codhorariodisp  String?      @db.Char(8)
+  horariodisp     HorarioDisp? @relation(fields: [codhorariodisp], references: [codhorariodisp], onDelete: NoAction, onUpdate: NoAction)
+  empleado        Empleado?    @relation(fields: [idempleado], references: [idempleado], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("dispoperario")
+}
+
+model AsignarOperario {
+  codoperarioxticket String    @id @db.Char(8)
+  idempleado         Int?
+  codticket          String?   @db.Char(8)
+  ticket             Ticket?   @relation(fields: [codticket], references: [codticket], onDelete: NoAction, onUpdate: NoAction)
+  empleado           Empleado? @relation(fields: [idempleado], references: [idempleado], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("asignaroperario")
+}
+
+model Herramienta {
+  codherramienta     String               @id @db.Char(6)
+  nombre             String?              @db.VarChar(20)
+  marca              String?              @db.VarChar(20)
+  modelo             String?              @db.VarChar(20)
+  stock              Int?
+  asignarherramienta AsignarHerramienta[]
+
+  @@map("herramienta")
+}
+
+model AsignarHerramienta {
+  codasignarherramienta String       @id @db.Char(8)
+  codherramienta        String?      @db.Char(6)
+  codrampa              String?      @db.Char(8)
+  herramienta           Herramienta? @relation(fields: [codherramienta], references: [codherramienta], onDelete: NoAction, onUpdate: NoAction)
+  rampa                 Rampa?       @relation(fields: [codrampa], references: [codrampa], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("asignarherramienta")
+}
+
+model categoriarepuesto {
+  codcategoriarepuesto String     @id @db.Char(8)
+  nombre               String?    @db.VarChar(20)
+  descripcion          String?    @db.VarChar(80)
+  repuesto             Repuesto[]
+}

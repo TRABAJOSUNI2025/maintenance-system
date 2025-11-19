@@ -237,7 +237,65 @@ jobs:
 
 ---
 
-## 🧮 Trazabilidad del Proyecto
+## 🔐 Sistema de Autenticación y Dashboards
+
+### ✅ Reciente implementación (v1.0.0)
+
+**Backend Authentication** con JWT:
+
+- ✅ Registro de usuarios (`POST /auth/register`)
+- ✅ Login con credenciales (`POST /auth/login`)
+- ✅ Refresh automático de tokens (`POST /auth/refresh`)
+- ✅ Obtener perfil de usuario (`GET /auth/profile`)
+- ✅ Cambio de contraseña (`POST /auth/change-password`)
+
+**Frontend Dashboards** por rol:
+
+- ✅ **ClientDashboard** - Vehículos, mantenimientos, servicios
+- ✅ **OperatorDashboard** - Tickets, performance, tareas
+- ✅ **AdminDashboard** - Menús expandibles, parámetros, catálogos
+- ✅ **SupervisorDashboard** - Reportes, estadísticas, validación
+
+**Usuarios de prueba incluidos:**
+
+```
+cliente@maintenance.local           password123  → ClientDashboard
+operario@maintenance.local          password123  → OperatorDashboard
+admin@maintenance.local             password123  → AdminDashboard
+supervisor@maintenance.local        password123  → SupervisorDashboard
+```
+
+### 📚 Documentación de Autenticación
+
+- `docs/SETUP_RAPIDO.md` - Setup en 5 minutos ⚡
+- `docs/BACKEND_AUTH_SETUP.md` - Detalles técnicos backend
+- `docs/BACKEND_AUTH_INTEGRATION.md` - Cómo integrar frontend
+- `docs/DASHBOARDS_POR_ROL.md` - Detalles de UIs
+- `docs/RESUMEN_EJECUTIVO_AUTH.md` - Resumen completo
+- `docs/VERIFICACION_BACKEND.md` - Checklist de verificación
+- `docs/INDICE_DOCUMENTACION_AUTH.md` - Índice de toda la documentación
+
+---
+
+### 🚀 Setup Rápido (5 minutos)
+
+```bash
+# Backend
+cd backend
+npm install
+npm run prisma:generate
+npm run prisma:migrate
+npm run prisma:seed
+npm run start:dev
+
+# Frontend (otra terminal)
+cd frontend
+npm run dev
+```
+
+Luego: Ir a `http://localhost:5173/login` y usa `cliente@maintenance.local / password123`
+
+---
 
 Cada historia de usuario tiene correspondencia directa con un módulo funcional.
 Consulta `docs/TRAZABILIDAD.md` para la relación completa entre **requerimientos ↔ código ↔ pruebas**.
@@ -253,6 +311,7 @@ Consulta `docs/TRAZABILIDAD.md` para la relación completa entre **requerimiento
 | `docs/QUALITY_STANDARDS.md` | Estándares de codificación, estilo y calidad.     |
 | `docs/TEST_PLAN.md`         | Plan y estrategia de pruebas.                     |
 | `docs/CHANGELOG.md`         | Historial de cambios y versiones.                 |
+| `docs/FRONTEND_AUTH.md`     | Documentación del sistema de autenticación.       |
 
 ---
 
