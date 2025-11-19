@@ -22,7 +22,6 @@ COPY frontend/package*.json ./frontend/
 RUN cd frontend && npm ci
 
 COPY frontend/src ./frontend/src
-COPY frontend/public ./frontend/public
 COPY frontend/index.html ./frontend/
 COPY frontend/vite.config.ts ./frontend/
 COPY frontend/tsconfig*.json ./frontend/
