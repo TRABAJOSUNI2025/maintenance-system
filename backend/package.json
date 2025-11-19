@@ -7,7 +7,7 @@
     "test": "test"
   },
   "scripts": {
-    "start": "nest start",
+    "start": "node dist/main",
     "start:dev": "nest start --watch",
     "build": "tsc",
     "lint": "eslint src --ext .ts",

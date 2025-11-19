@@ -1,10 +1,12 @@
 import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import * as path from 'path';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   // Enable CORS
   app.enableCors({
@@ -25,6 +27,24 @@ async function bootstrap() {
 
   // Global prefix
   app.setGlobalPrefix('api');
+
+  // Servir archivos estáticos del frontend
+  const frontendPath = path.join(__dirname, '../../frontend/dist');
+  app.useStaticAssets(frontendPath);
+
+  // Redirigir rutas desconocidas al index.html (SPA)
+  app.use((req, res, next) => {
+    if (!req.url.startsWith('/api/') && req.url !== '/api/docs' && req.url !== '/api/docs-json') {
+      // Si no es una ruta de API, servir index.html
+      if (!req.url.includes('.')) {
+        res.sendFile(path.join(frontendPath, 'index.html'));
+      } else {
+        next();
+      }
+    } else {
+      next();
+    }
+  });
 
   const port = process.env.PORT || 3000;
   await app.listen(port);
