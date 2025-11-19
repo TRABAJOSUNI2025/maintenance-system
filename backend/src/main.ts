@@ -30,7 +30,7 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
 
   // Servir archivos estáticos del frontend
-  const frontendPath = path.join(__dirname, '../../frontend/dist');
+  const frontendPath = path.join(__dirname, '../frontend/dist');
   app.useStaticAssets(frontendPath);
 
   // Redirigir rutas desconocidas al index.html (SPA)

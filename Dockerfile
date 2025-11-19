@@ -36,18 +36,18 @@ RUN cd frontend && npm run build
 # Production stage
 FROM node:20-alpine
 
-WORKDIR /app
+WORKDIR /app/backend
 
 # Copiar backend
-COPY --from=backend-builder /app/backend/node_modules ./backend/node_modules
-COPY --from=backend-builder /app/backend/dist ./backend/dist
-COPY backend/package*.json ./backend/
-COPY backend/prisma ./backend/prisma
+COPY --from=backend-builder /app/backend/node_modules ./node_modules
+COPY --from=backend-builder /app/backend/dist ./dist
+COPY backend/package*.json ./
+COPY backend/prisma ./prisma
 
-# Copiar frontend dist
-COPY --from=frontend-builder /app/frontend/dist ./frontend/dist
+# Copiar frontend dist a nivel superior
+COPY --from=frontend-builder /app/frontend/dist ../frontend/dist
 
 EXPOSE 3000
 
 # Ejecutar migraciones y luego la app
-CMD ["sh", "-c", "cd backend && npx prisma migrate deploy && npm start"]
+CMD ["sh", "-c", "npx prisma migrate deploy && npm start"]
