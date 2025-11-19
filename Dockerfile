@@ -31,14 +31,9 @@ COPY frontend/vite.config.ts ./
 COPY frontend/tsconfig*.json ./
 COPY frontend/tailwind.config.js ./
 COPY frontend/postcss.config.js ./
-COPY frontend/dist ./dist
 
-# Si dist ya existe, no compilar. Si no, compilar.
-RUN if [ -d "dist" ] && [ -f "dist/index.html" ]; then \
-      echo "Frontend dist found, skipping build"; \
-    else \
-      echo "Building frontend..." && npm run build || (echo "Frontend build failed" && exit 1); \
-    fi
+# Compilar frontend
+RUN npm run build
 
 # Production stage
 FROM node:20-alpine
