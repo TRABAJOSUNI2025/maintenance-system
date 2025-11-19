@@ -31,14 +31,25 @@ async function bootstrap() {
 
   // Servir archivos estáticos del frontend
   const frontendPath = path.join(__dirname, '../frontend/dist');
-  app.useStaticAssets(frontendPath);
+  try {
+    app.useStaticAssets(frontendPath);
+  } catch (error) {
+    console.warn(`Warning: Frontend static assets not found at ${frontendPath}`);
+  }
 
   // Redirigir rutas desconocidas al index.html (SPA)
   app.use((req: Request, res: Response, next: NextFunction) => {
     if (!req.url.startsWith('/api/') && req.url !== '/api/docs' && req.url !== '/api/docs-json') {
       // Si no es una ruta de API, servir index.html
       if (!req.url.includes('.')) {
-        res.sendFile(path.join(frontendPath, 'index.html'));
+        res.sendFile(path.join(frontendPath, 'index.html'), (err: any) => {
+          if (err) {
+            res.status(404).json({ 
+              statusCode: 404, 
+              message: 'Frontend not available. Please configure the frontend build.' 
+            });
+          }
+        });
       } else {
         next();
       }

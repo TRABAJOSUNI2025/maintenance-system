@@ -32,7 +32,7 @@ COPY frontend/tsconfig*.json ./
 COPY frontend/tailwind.config.js ./
 COPY frontend/postcss.config.js ./
 
-RUN npm run build
+RUN npm run build || (echo "Frontend build failed. Listing directory:" && ls -la && exit 1)
 
 # Production stage
 FROM node:20-alpine
