@@ -4,7 +4,7 @@ FROM node:20-alpine AS backend-builder
 WORKDIR /app
 
 COPY backend/package*.json ./backend/
-RUN cd backend && npm ci
+RUN cd backend && npm install
 
 COPY backend/src ./backend/src
 COPY backend/tsconfig.json ./backend/
@@ -19,7 +19,7 @@ FROM node:20-alpine AS frontend-builder
 WORKDIR /app
 
 COPY frontend/package*.json ./frontend/
-RUN cd frontend && npm ci
+RUN cd frontend && npm install
 
 COPY frontend/src ./frontend/src
 COPY frontend/index.html ./frontend/
