@@ -4,7 +4,7 @@
     "builder": "dockerfile"
   },
   "deploy": {
-    "startCommand": "cd backend && npm start",
+    "startCommand": "npm start",
     "restartPolicyMaxRetries": 5
   }
 }
