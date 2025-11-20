@@ -1,3 +1,4 @@
+# Historias de usuario: https://docs.google.com/spreadsheets/d/1W9F10iHMJnJNJuLMvTjfT-vOt30XN7Lo_6pXB7MTiu4/edit?usp=sharing
 # 🚗 Sistema de Gestión de Mantenimiento – Proyecto Universitario
 
 > Proyecto académico desarrollado bajo buenas prácticas de ingeniería de software, con fines educativos para el curso **Sistemas de Calidad de Software**.  
